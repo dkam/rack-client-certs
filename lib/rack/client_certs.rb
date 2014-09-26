@@ -9,35 +9,36 @@ module Rack
     end
 
     def initialize(app)
-      @app = app       
+      @app = app
       @ca = OpenSSL::X509::Certificate.new( ::File.read( @@ca_file ))
-    end                
+    end
 
-    def call(env)      
-
-      if env['rack.peer_cert']
+    def call(env)
+      if env.has_key? 'rack.peer_cert'
         client_cert = OpenSSL::X509::Certificate.new( env['rack.peer_cert'] )
+      elsif env.has_key? 'SSL_CLIENT_CERT' && env['SSL_CLIENT_CERT'].length > 0
+        client_cert = OpenSSL::X509::Certificate.new( env['SSL_CLIENT_CERT'] )
       end
 
       if client_cert && client_cert.issuer == @ca.subject
         res = client_cert.verify(@ca.public_key) ? 'SUCCESS' : 'FAILED'
 
         if res == 'SUCCESS'
-          env["HTTP-X-CLIENT-NAME"]  = extract_name(client_cert)
-          env["HTTP-X-CLIENT-EMAIL"] = extract_email(client_cert)
+          env["CLIENT-CERT-NAME"]  = extract_name(client_cert)
+          env["CLIENT-CERT-EMAIL"] = extract_email(client_cert)
         end
 
       else
         res = "NONE"
       end
 
-      env["HTTP-X-CLIENT-VERIFY"] = res
+      env["CLIENT-CERT-VERIFY"] = res
 
       status, headers, body = @app.call(env)
 
       [status, headers, body]
-      
-    end                
+
+    end
 
     private
     def extract_name(cert)
@@ -51,4 +52,4 @@ module Rack
         return email_a.nil? ? nil : email_a[1]
     end
   end
-end 
+end
