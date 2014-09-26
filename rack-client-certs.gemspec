@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "rack-client-certs"
-  spec.version       = 0.0.1
+  spec.version       = '0.0.1'
   spec.authors       = ["Dan Milne"]
   spec.email         = ["d@nmilne.com"]
   spec.summary       = %q{Process any presented SSL client certificates.}
