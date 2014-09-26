@@ -14,9 +14,9 @@ module Rack
     end
 
     def call(env)
-      if env.has_key? 'rack.peer_cert'
+      if env['rack.peer_cert']
         client_cert = OpenSSL::X509::Certificate.new( env['rack.peer_cert'] )
-      elsif env.has_key? 'SSL_CLIENT_CERT' && env['SSL_CLIENT_CERT'].length > 0
+      elsif env['SSL_CLIENT_CERT'] && env['SSL_CLIENT_CERT'].length > 0
         client_cert = OpenSSL::X509::Certificate.new( env['SSL_CLIENT_CERT'] )
       end
 
